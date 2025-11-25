@@ -1,105 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Pomodoro Arena</title>
-<style>
-  body {
-    margin: 0;
-    padding: 0;
-    background: url('https://i.imgur.com/1u8in5P.jpeg') center/cover no-repeat fixed;
-    font-family: 'Georgia', serif;
-    color: #f1e6d0;
-    text-align: center;
-  }
-
-  .overlay {
-    backdrop-filter: blur(3px);
-    background: rgba(0,0,0,0.55);
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .title {
-    font-size: 48px;
-    font-weight: bold;
-    text-shadow: 0 0 20px gold;
-    margin-bottom: 40px;
-  }
-
-  .timer {
-    font-size: 80px;
-    margin: 20px 0;
-    text-shadow: 0 0 15px #00aaff;
-  }
-
-  .hp-bar {
-    width: 60%;
-    height: 30px;
-    border: 2px solid #d4b27f;
-    border-radius: 10px;
-    margin: 20px auto;
-    overflow: hidden;
-  }
-
-  .hp-fill {
-    height: 100%;
-    background: linear-gradient(to right, #ff3d3d, #ff8c00);
-    width: 100%;
-    transition: width 0.3s;
-  }
-
-  button {
-    padding: 15px 40px;
-    font-size: 20px;
-    border: none;
-    border-radius: 10px;
-    background: #d4b27f;
-    color: #000;
-    cursor: pointer;
-    font-weight: bold;
-    box-shadow: 0 0 10px gold;
-    transition: 0.2s;
-  }
-
-  button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 20px gold;
-  }
-
-  .result {
-    font-size: 60px;
-    font-weight: bold;
-    margin-top: 30px;
-    text-shadow: 0 0 25px gold;
-    display: none;
-  }
-
-  .victory { color: #ffdd55; }
-  .defeat { color: #ff4444; }
-</style>
-</head>
-<body>
-  <div class="overlay">
-    <div class="title">POMODORO ARENA</div>
-    <div class="timer" id="timer">25:00</div>
-
-    <div class="hp-bar">
-      <div class="hp-fill" id="hp"></div>
-    </div>
-
-    <button id="startBtn">Start Battle</button>
-    <div class="result victory" id="victory">VICTORY!</div>
-    <div class="result defeat" id="defeat">DEFEAT!</div>
-  </div>
-
 <script>
-let totalSeconds = 25 * 60;
+let totalSeconds = 25 * 60; // 25 phút
 let currentSeconds = totalSeconds;
 let running = false;
 let interval;
@@ -116,6 +16,23 @@ function updateTimer() {
   timerEl.textContent = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
 }
 
+function updateHP() {
+  let ratio = currentSeconds / totalSeconds;
+  hpEl.style.width = (ratio * 100) + '%';
+}
+
+function victory() {
+  victoryEl.style.display = 'block';
+  running = false;
+  clearInterval(interval);
+}
+
+function defeat() {
+  defeatEl.style.display = 'block';
+  running = false;
+  clearInterval(interval);
+}
+
 function startBattle() {
   if (running) return;
   running = true;
@@ -124,6 +41,7 @@ function startBattle() {
   defeatEl.style.display = 'none';
   currentSeconds = totalSeconds;
   updateTimer();
+  updateHP();
 
   interval = setInterval(() => {
     currentSeconds--;
@@ -131,32 +49,9 @@ function startBattle() {
     updateHP();
 
     if (currentSeconds <= 0) {
-      clearInterval(interval);
       victory();
     }
   }, 1000);
-
-
-function updateHP() {
-  let ratio = currentSeconds / totalSeconds;
-  hpEl.style.width = (ratio * 100) + '%';
-}
-
-function victory() {
-  victoryEl.style.display = 'block';
-  document.getElementById('victorySound').play();
-  running = false;
-  
-
-function defeat() {
-  defeatEl.style.display = 'block';
-  document.getElementById('defeatSound').play();
-  running = false;
-  clearInterval(interval);
-}
-  defeatEl.style.display = 'block';
-  running = false;
-  clearInterval(interval);
 }
 
 // Detect tab change → defeat
@@ -172,7 +67,3 @@ document.addEventListener(visibilityChange, () => {
 
 startBtn.addEventListener('click', startBattle);
 </script>
-  <audio id="victorySound" src="https://cdn.jsdelivr.net/gh/johanbrook/league-sounds/victory.mp3"></audio>
-  <audio id="defeatSound" src="https://cdn.jsdelivr.net/gh/johanbrook/league-sounds/defeat.mp3"></audio>
-</body>
-</html>
